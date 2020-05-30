@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UsersConfig',
+    'tournamentPortalApp.apps.TournamentportalappConfig',
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [
@@ -75,11 +78,16 @@ WSGI_APPLICATION = 'tournamentPortal.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': 'localhost',
+        'NAME': 'tournamentAppDev',
+        'PASSWORD': 'dev',
+        'PORT': 5432,
+        'USER': 'dev'
     }
 }
 
+AUTH_USER_MODEL = 'users.PortalUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -105,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 

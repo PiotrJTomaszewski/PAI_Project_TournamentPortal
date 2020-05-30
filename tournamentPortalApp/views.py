@@ -1,3 +1,12 @@
 from django.shortcuts import render
 
-# Create your views here.
+def index(request):
+    context = {
+    }
+    return render(request, 'tournaments/index.html', context)
+
+def tournamentList(request):
+    context = {
+
+    }
+    return render(request, 'tournaments/list.html', context)
