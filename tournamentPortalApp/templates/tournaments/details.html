@@ -1,0 +1,43 @@
+{% extends 'tournaments/layout.html' %}
+{% load static %}
+
+{% block content %}
+<h1>{{ object.name }}</h1>
+
+{{ object.entry_limit }} {{ object.event_date|date }} {{ object.creator }} {{
+object.organiser_name }} {{ object.location_type }} {{ object.location }} {{
+object.game_format }} {{ object.deck_format }} {{ object.description }} {{
+object.prizes }}
+
+{{ location_type_text }}
+{{ game_format_text }}
+{{ deck_format_text }}
+<div>
+  <h2>Information</h2>
+  <dl>
+    <dt>Event date & time</dt>
+    <dd>{{ object.event_date|date:"F jS Y P" }}</dd>
+    <dt>Entry limit</dt>
+    <dd>{{ object.entry_limit }}</dd>
+    <dt>Game format</dt>
+    <dd>{{ game_format_text }}</dd>
+    <dt>Deck format</dt>
+    <dd>{{ deck_format_text }}</dd>
+  </dl>
+
+<svg id="tournamentBracket">
+</svg>
+
+<script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(() => {
+    const svg = $("#tournamentBracket");
+    const drawRegionArea = {
+      width: 1200,
+      height: 600
+    }
+    var bracket = new TournamentBracket(null, null, drawRegionArea);
+    svg.width(drawRegionArea.width).height(drawRegionArea.height).html(bracket.svgHtml);
+  })
+</script>
+{% endblock content %}
