@@ -1,5 +1,6 @@
 #!/bin/bash
-docker run -i \
+docker run -d \
+    --network bridge \
     -p 5432:5432 \
     --name tournamentAppDevDB \
     -e POSTGRES_USER="dev" \

@@ -1,5 +1,27 @@
 {% extends 'tournaments/layout.html' %}
 
 {% block content %}
-<div>Test</div>
+<table class="std-table">
+<thead>
+  <tr>
+    <th scope="col" class="std-th">Tournament Name</th>
+    <th scope="col" class="std-th">Event date</th>
+  </tr>
+</thead>
+<tbody>
+  {% for tournament in tournaments %}
+  <tr>
+    <td class="std-td">{{ tournament.name }}</td>
+    <td class="std-td">{{ tournament.event_date|date:"d-m-Y" }}</td>
+    <td class="std-td"></td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td class="std-td">
+      No tournaments found
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
 {% endblock content %}
