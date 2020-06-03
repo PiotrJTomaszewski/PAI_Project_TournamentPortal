@@ -15,23 +15,50 @@ object.prizes }}
 <div>
   <h2>Information</h2>
   <dl>
-    <dt>Event date & time</dt>
-    <dd>{{ object.event_date|date:"F jS Y P" }}</dd>
+    <dt>Event date</dt>
+    <dd>{{ object.event_date|date:"F jS Y" }}</dd>
+    <dt>Starting time</dt>
+    <dd>{{ object.event_date|date:"P" }}</dd>
     <dt>Entry limit</dt>
     <dd>{{ object.entry_limit }}</dd>
+    <dt>Organiser</dt>
+    <dd>{{ object.organiser_name }}</dd>
     <dt>Game format</dt>
     <dd>{{ game_format_text }}</dd>
     <dt>Deck format</dt>
     <dd>{{ deck_format_text }}</dd>
   </dl>
+</div>
+<div>
+  <h2>Description</h2>
+  <p>{{ object.description }}</p>
+</div>
+<div>
+  <h2>Prices</h2>
+  <p>{{ object.prizes }}</p>
+</div>
+<div>
+  <h2>Participants</h2>
+</div>
 
-<svg id="tournamentBracket">
-</svg>
+<div id="mapId" data-name="{{ object.name }}"></div>
+
+<!-- <svg id="tournamentBracketId"></svg> -->
 
 <script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(() => {
-    const svg = $("#tournamentBracket");
+    const mapDiv = document.getElementById("mapId");
+    const eventName = mapDiv.dataset.name;
+    var eventLocationMap = L.map('mapId').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }).addTo(eventLocationMap);
+    L.control.scale().addTo(eventLocationMap);
+    L.marker({lon: 0, lat: 0}).bindPopup(eventName).addTo(eventLocationMap);
+
+    const svg = $("#tournamentBracketId");
     const drawRegionArea = {
       width: 1200,
       height: 600
@@ -41,3 +68,8 @@ object.prizes }}
   })
 </script>
 {% endblock content %}
+
+{% block extra_libraries %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+{% endblock extra_libraries %}
