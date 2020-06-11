@@ -8,6 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.contrib.auth import login
+from django.core.paginator import Paginator
 
 from .models import Tournament, Sponsor, PortalUser
 from .forms import *
@@ -101,17 +102,16 @@ def portalUserResetPassword(request, uuid_base64, token):
         messages.add_message(request, messages.ERROR, "Activation link is invalid")
         return redirect(reverse('index'))
 
-
-
 class TournamentList(ListView):
     template_name = 'tournaments/list.html'
     model = Tournament
-    paginate_by = 10
+    paginate_by = 9
     context_object_name = 'tournaments'
+    queryset = Tournament.objects.order_by('entry_deadline') # TODO: Filter
+    # TODO: Implement search box
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+
+
 
 class TournamentDetail(DetailView):
     template_name = 'tournaments/details.html'

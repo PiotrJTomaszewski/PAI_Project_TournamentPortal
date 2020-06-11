@@ -2,24 +2,63 @@
 {% load humanize %}
 
 {% block content %}
-{% for tournament in tournaments %}
-  <div class="card">
-    <div class="card-header">{{ tournament.name }}</div>
-    <div class="card-body">
-      <div title="Event date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_date|date:"F jS Y" }}</div>
-      <div title="Event time"><i class="far fa-clock padded-icon"></i>{{ tournament.event_date|date:"P" }}</div>
-      <div title="Entry deadline"><i class="far fa-calendar-times padded-icon"></i>{{ tournament.entry_deadline|naturaltime }}</div>
-      <div title="Participants"><i class="fas fa-users padded-icon"></i>Ileś / {{ tournament.entry_limit }}</div>
-      <div title="Format">{{ tournament.game_format }}, {{ tournament.deck_format }}</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-10">
+      <div class="d-flex flex-wrap">
+        {% for tournament in tournaments %}
+          <div class="card tournament-list-element">
+            <div class="card-header">{{ tournament.name }}</div>
+            <div class="card-body">
+              <div title="Event date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_date|date:"F jS Y" }}</div>
+              <div title="Event time"><i class="far fa-clock padded-icon"></i>{{ tournament.event_date|date:"P" }}</div>
+              <div title="Entry deadline"><i class="far fa-calendar-times padded-icon"></i>{{ tournament.entry_deadline|naturaltime }}</div>
+              <div title="Participants"><i class="fas fa-users padded-icon"></i>Ileś / {{ tournament.entry_limit }}</div>
+              <div title="Format">{{ tournament.game_format }}, {{ tournament.deck_format }}</div>
+              <a href="{% url 'tournamentDetail' tournament.id %}"><button type="button" class="btn btn-primary m-1">Show info</button></a>
+            </div>
+          </div>
+        {% empty %}
+        <div class="display-1 jumbotron mx-auto">
+          There are no tournaments
+        </div>
+        {% endfor %}
+      </div>
+      {% if is_paginated %}
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previos_page_number }}">Previous</a></li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          {% endif %}
+          {% for i in paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+          {% endif %}
+        </ul>
+      {% endif %}
     </div>
-    <div class="card-footer">
-      <a href="{% url 'tournamentDetail' tournament.id %}"><button type="button" class="button">Show info</button></a>
+    <div class="col">
+      <div class="card infobox">
+        <div class="card-body">
+          <h5 class="card-title">Become an organizer</h5>
+          <p class="card-text">If you are organizing a tournament and want to announce it on our Portal, 
+            {% if user.is_authenticated %}
+            click below.</p><a href="{% url 'tournamentCreate' %}" class="card-link">Announce a tournament</a>
+            {% else %}
+            please login or signup.</p>
+            {% endif %}
+        </div>
+      </div>
     </div>
   </div>
-{% empty %}
-<div class="display-1 jumbotron mx-auto">
-  There are no tournaments
 </div>
-{% endfor %}
-
 {% endblock content %}
