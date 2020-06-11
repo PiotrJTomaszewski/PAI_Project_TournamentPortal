@@ -1,15 +1,31 @@
-{% extends 'tournaments/layout.html' %}
+{% extends 'layout.html' %}
+{% load static %}
 
 {% block content %}
 
-<form action={% url 'tournaments:tournamentCreate' %} method="POST">
-  {% csrf_token %}
-  {{ form }}
-  <input type="submit" value="Submit"/>
+<form action={% url 'tournamentCreateRequest' %} method="POST" class="normal-form">
+  <fieldset class="normal-fieldset">
+    <legend class="normal-form-legend">Announce new tournament</legend>
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" class="normal-form-submit"/>
+  </fieldset>
 </form>
 
 <script type="text/javascript">
-
+$(document).ready(() => {
+  $("#id_entry_deadline").datetimepicker({
+    format: 'Y-m-d H:i'
+  });
+  $("#id_event_date").datetimepicker({
+    format: 'Y-m-d H:i'
+  });
+})
 </script>
 
 {% endblock content %}
+
+{% block extra_libraries %}
+<link rel="stylesheet" type="text/css" href="{% static 'libs/jquery.datetimepicker.min.css' %}" />
+<script src="{% static 'libs/jquery.datetimepicker.full.min.js' %}"></script>
+{% endblock extra_libraries %}

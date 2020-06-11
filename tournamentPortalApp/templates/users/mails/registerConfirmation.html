@@ -1,0 +1,5 @@
+{% autoescape off %}
+Hi {{ name }},
+Please go to this address to activate your account
+http://{{ domain }}{% url 'userRegisterActivate' uuid_base64=uuid token=token %}
+{% endautoescape %}

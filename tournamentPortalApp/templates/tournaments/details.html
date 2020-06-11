@@ -1,56 +1,65 @@
-{% extends 'tournaments/layout.html' %}
+{% extends 'layout.html' %}
 {% load static %}
 
 {% block content %}
-<h1>{{ object.name }}</h1>
+  <h1>{{ object.name }}</h1>
 
-{{ object.entry_limit }} {{ object.event_date|date }} {{ object.creator }} {{
-object.organiser_name }} {{ object.location_type }} {{ object.location }} {{
-object.game_format }} {{ object.deck_format }} {{ object.description }} {{
-object.prizes }}
+  {{ object.entry_limit }} {{ object.event_date|date }} {{ object.creator }} {{
+  object.organiser_name }} {{ object.location_type }} {{ object.location }} {{
+  object.game_format }} {{ object.deck_format }} {{ object.description }} {{
+  object.prizes }}
 
-{{ location_type_text }}
-{{ game_format_text }}
-{{ deck_format_text }}
-<div>
-  <h2>Information</h2>
-  <dl>
-    <dt>Event date</dt>
-    <dd>{{ object.event_date|date:"F jS Y" }}</dd>
-    <dt>Starting time</dt>
-    <dd>{{ object.event_date|date:"P" }}</dd>
-    <dt>Entry limit</dt>
-    <dd>{{ object.entry_limit }}</dd>
-    <dt>Organiser</dt>
-    <dd>{{ object.organiser_name }}</dd>
-    <dt>Game format</dt>
-    <dd>{{ game_format_text }}</dd>
-    <dt>Deck format</dt>
-    <dd>{{ deck_format_text }}</dd>
-  </dl>
-</div>
-<div>
-  <h2>Description</h2>
-  <p>{{ object.description }}</p>
-</div>
-<div>
-  <h2>Prices</h2>
-  <p>{{ object.prizes }}</p>
-</div>
-<div>
-  <h2>Participants</h2>
-</div>
+  {{ location_type_text }}
+  {{ game_format_text }}
+  {{ deck_format_text }}
+  <div class="card">
+    <div class="card-header">Information</div>
+    <dl>
+      <dt class="dict-long-head">Event date</dt>
+      <dd>{{ object.event_date|date:"F jS Y" }}</dd>
+      <dt class="dict-long-head">Starting time</dt>
+      <dd>{{ object.event_date|date:"P" }}</dd>
+      <dt class="dict-long-head">Entry limit</dt>
+      <dd>{{ object.entry_limit }}</dd>
+      <dt class="dict-long-head">Organiser</dt>
+      <dd>{{ object.organiser_name }}</dd>
+      <dt class="dict-long-head">Game format</dt>
+      <dd>{{ object.game_format }}</dd>
+      <dt class="dict-long-head">Deck format</dt>
+      <dd>{{ object.deck_format }}</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <div class="card-header">Description</div>
+    <p>{{ object.description }}</p>
+  </div>
+  <div class="card">
+    <div class="card-header">Prizes</div>
+    <p>{{ object.prizes }}</p>
+  </div>
+  <div class="card">
+    <div class="card-header">Participants</div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      Sponsors {% if is_creator %}<a class="btn btn-primary" href="{% url 'sponsorCreate' object.id %}">Add new</a>{% endif %}
+    </div>
+    <div class="card-body">
+      {% for sponsor in sponsors %}
+        <img src="{{ MEDIA_URL }}/{{ sponsor.logo }}" alt="{{ sponsor.name }}" title="{{ sponsor.name }}" />
+      {% endfor %}
+    </div>
+  </div>
+  <div id="event-map-id" data-name="{{ object.name }}"></div>
 
-<div id="mapId" data-name="{{ object.name }}"></div>
+  <svg id="tournament-bracket-id"></svg>
 
-<!-- <svg id="tournamentBracketId"></svg> -->
-
-<script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
+  <script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(() => {
-    const mapDiv = document.getElementById("mapId");
+    const mapDiv = document.getElementById('event-map-id');
     const eventName = mapDiv.dataset.name;
-    var eventLocationMap = L.map('mapId').setView([51.505, -0.09], 13);
+    var eventLocationMap = L.map('event-map-id').setView([51.505, -0.09], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -58,7 +67,7 @@ object.prizes }}
     L.control.scale().addTo(eventLocationMap);
     L.marker({lon: 0, lat: 0}).bindPopup(eventName).addTo(eventLocationMap);
 
-    const svg = $("#tournamentBracketId");
+    const svg = $("#tournament-bracket-id");
     const drawRegionArea = {
       width: 1200,
       height: 600

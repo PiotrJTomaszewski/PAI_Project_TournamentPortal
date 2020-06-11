@@ -5,5 +5,5 @@
 venv
 __pycache__
 
-# Database
-db.sqlite3
+tmp
+tournamentPortalApp/migrations

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action={% url 'sponsorCreateRequest' tournament_id %} method="POST" class="normal-form" enctype="multipart/form-data">
+    <fieldset class="normal-fieldset">
+      <legend class="normal-form-legend">Add tournament sponsors</legend>
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Submit" class="normal-form-submit"/>
+    </fieldset>
+  </form>
+{% endblock %}

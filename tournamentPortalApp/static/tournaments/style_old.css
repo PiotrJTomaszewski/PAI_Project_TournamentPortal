@@ -1,0 +1,150 @@
+ :root {
+  --main-bg-color: #003749;
+  --main-card-bg-color: #044f68;
+  --main-text-header-color: #ffa200;
+  --main-text-color: #ffffff;
+  --site-header-color: #048ebb;
+  --site-header-btn: #4079d3;
+  --site-header-btn-pressed: #011e4c;
+  --main-btn-color: #ff8300;
+  --main-btn-pressed: #be680b;
+  --main-form-field-bg-color: #048ebb;
+}
+
+* {
+  margin: 0px;
+  padding: 0px;
+  color: var(--main-text-color);
+  text-decoration: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--main-bg-color);
+  align-items: center;
+}
+
+.container {
+  display: flex;
+}
+
+#top-navbar-id {
+  background-color: var(--site-header-color);
+  list-style-type: none;
+  width: 100vw;
+  height: 100px;
+}
+
+.top-navbar-element {
+  display: inline;
+  padding: 8px;
+  background-color: var(--site-header-btn);
+}
+
+.top-navbar-username {
+  display: inline;
+  padding: 8px;
+  background-color: var(--site-header-btn);
+}
+
+h1, h2 {
+  color: var(--main-text-header-color);
+}
+
+h1 {
+  font-size: 5em;
+}
+
+/* .std-table,
+.std-th,
+.std-td {
+  border: 1px solid #000000;
+} */
+
+.site-content {
+  width: 80vw;
+}
+
+#event-map-id {
+  height: 300px;
+  width: 300px;
+}
+
+
+.card {
+  background-color: var(--main-card-bg-color);
+  padding: 1vw;
+  margin: 1vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  font-size: 2rem;
+  color: var(--main-text-header-color);
+}
+
+.card-body {
+  /* padding: 10px 0 10px 0; */
+  
+}
+
+.card-footer {
+  padding-top: 10px;
+}
+
+.dict-long-head {
+  font-size: 1.4rem;
+}
+
+.dict-short-head {
+  display: inline;
+}
+
+.padded-icon {
+  padding: 5px;
+}
+
+.button {
+  background-color: var(--main-btn-color);
+  padding: 5px;
+  font-size: 1.3rem;
+}
+
+.button:active {
+  background-color: var(--main-btn-pressed);
+}
+
+.centered {
+  align-self: center;
+}
+
+.normal-fieldset {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
+
+.normal-form-legend {
+  font-size: 1.5rem;
+}
+
+.normal-form-submit {
+  background-color: var(--main-btn-color);
+  font-size: 1.4rem;
+}
+
+.normal-form-submit:active {
+  background-color: var(--main-btn-pressed);
+}
+
+input, select, textarea {
+  background-color: var(--main-form-field-bg-color);
+}
+
+.rounded {
+  border-radius: 10px;
+}

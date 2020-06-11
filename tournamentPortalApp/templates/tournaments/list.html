@@ -1,27 +1,25 @@
-{% extends 'tournaments/layout.html' %}
+{% extends 'layout.html' %}
+{% load humanize %}
 
 {% block content %}
-<table class="std-table">
-<thead>
-  <tr>
-    <th scope="col" class="std-th">Tournament Name</th>
-    <th scope="col" class="std-th">Event date</th>
-  </tr>
-</thead>
-<tbody>
-  {% for tournament in tournaments %}
-  <tr>
-    <td class="std-td">{{ tournament.name }}</td>
-    <td class="std-td">{{ tournament.event_date|date:"d-m-Y" }}</td>
-    <td class="std-td"></td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td class="std-td">
-      No tournaments found
-    </td>
-  </tr>
-  {% endfor %}
-</tbody>
-</table>
+{% for tournament in tournaments %}
+  <div class="card">
+    <div class="card-header">{{ tournament.name }}</div>
+    <div class="card-body">
+      <div title="Event date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_date|date:"F jS Y" }}</div>
+      <div title="Event time"><i class="far fa-clock padded-icon"></i>{{ tournament.event_date|date:"P" }}</div>
+      <div title="Entry deadline"><i class="far fa-calendar-times padded-icon"></i>{{ tournament.entry_deadline|naturaltime }}</div>
+      <div title="Participants"><i class="fas fa-users padded-icon"></i>Ileś / {{ tournament.entry_limit }}</div>
+      <div title="Format">{{ tournament.game_format }}, {{ tournament.deck_format }}</div>
+    </div>
+    <div class="card-footer">
+      <a href="{% url 'tournamentDetail' tournament.id %}"><button type="button" class="button">Show info</button></a>
+    </div>
+  </div>
+{% empty %}
+<div class="display-1 jumbotron mx-auto">
+  There are no tournaments
+</div>
+{% endfor %}
+
 {% endblock content %}
