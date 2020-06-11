@@ -1,5 +1,11 @@
 {% autoescape off %}
 Hi {{ name }},
-Please go to this address to activate your account
+
+Please go to this address to activate Your account
 http://{{ domain }}{% url 'userRegisterActivate' uuid_base64=uuid token=token %}
+
+Best regards,
+Tournament Portal Team
+
+This is an automated message, please don't respond.
 {% endautoescape %}

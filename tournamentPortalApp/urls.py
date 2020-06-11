@@ -11,9 +11,10 @@ urlpatterns = [
     path('tournaments/<int:pk>', views.TournamentDetail.as_view(), name='tournamentDetail'),
     path('tournaments/<int:tournament_id>/sponsors/create', views.sponsorCreate, name='sponsorCreate'),
     path('tournaments/<int:tournament_id>/sponsors/create/request', views.sponsorCreateRequest, name='sponsorCreateRequest'),
-    path('users/login/', views.userLogin, name="userLogin"),
-    path('users/login/request', views.userLoginRequest, name="userLoginRequest"),
+    path('users/login/', views.PortalUserLogin.as_view(), name="userLogin"),
     path('users/logout', views.userLogout, name="userLogout"),
     path('users/register', views.portalUserRegister.as_view(), name="userRegister"),
-    path('users/activate/<str:uuid_base64>/<str:token>', views.portalUserActivate, name="userRegisterActivate")
+    path('users/activate/<str:uuid_base64>/<str:token>', views.PortalUserActivate, name="userRegisterActivate"),
+    path('users/password/forgot', views.PortalUserPasswordForgotten.as_view(), name="userPasswordForgotten"),
+    path('users/<str:uuid_base64>/password/reset/<str:token>', views.portalUserResetPassword, name="userPasswordReset")
 ]

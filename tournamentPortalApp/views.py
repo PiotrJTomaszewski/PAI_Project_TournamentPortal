@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.list import ListView
-from django.views.generic import DetailView, CreateView, FormView
+from django.views.generic import DetailView, CreateView, FormView, UpdateView, TemplateView
 from django.contrib import messages
 import django.contrib.auth as auth
 from django.contrib.auth.decorators import login_required
@@ -10,10 +10,10 @@ from django.utils.encoding import force_text
 from django.contrib.auth import login
 
 from .models import Tournament, Sponsor, PortalUser
-from .forms import TournamentCreateForm, PortalUserCreationForm, PortalUserChangeForm, PortalUserLoginForm, SponsorCreateForm
+from .forms import *
 from .helpers import formErrorsToMessage
-from .tokens import account_activation_token
-from .mail import sendRegisterConfirmationMail
+from .tokens import account_token
+from .mail import sendRegisterConfirmationMail, sendPasswordResetMail
 
 def index(request):
     context = {
@@ -25,7 +25,6 @@ class portalUserRegister(FormView):
     form_class = PortalUserCreationForm
     template_name = 'users/register.html'
     success_url = reverse_lazy('tournamentList')
-
     def form_valid(self, form):
         # Called if valid data was posted
         user = form.save(commit=False)
@@ -37,13 +36,13 @@ class portalUserRegister(FormView):
         messages.add_message(self.request, messages.SUCCESS, "Successfully registered. We've sent an activation link to your email")
         return super().form_valid(form)
 
-def portalUserActivate(request, uuid_base64, token):
+def PortalUserActivate(request, uuid_base64, token):
     try:
         uuid = force_text(urlsafe_base64_decode(uuid_base64))
         user = PortalUser.objects.get(uuid=uuid)
     except:
         user = None
-    if user is not None and account_activation_token.check_token(user, token):
+    if user is not None and account_token.check_token(user, token):
         user.is_active = True
         user.save()
         login(request, user)
@@ -52,6 +51,55 @@ def portalUserActivate(request, uuid_base64, token):
         messages.add_message(request, messages.ERROR, "Activation link is invalid")
     return redirect(reverse('index'))
 
+class PortalUserLogin(FormView):
+    model = PortalUser
+    form_class = PortalUserLoginForm
+    template_name = 'users/login.html'
+    success_url = reverse_lazy('tournamentList')  #TODO: Redirect user to his dashboard
+    def form_valid(self, form):
+        # Called if valid data was posted
+        user = form.user
+        auth.login(self.request, user)
+        return super().form_valid(form)
+
+class PortalUserPasswordForgotten(FormView):
+    form_class = PortalUserPasswordForgottenForm
+    template_name = 'users/password_forgotten.html'
+    success_url = reverse_lazy('index')
+    def form_valid(self, form):
+        try:
+            user = PortalUser.objects.get(email=form.cleaned_data['email'])
+            if user is not None:
+                sendPasswordResetMail(self.request, user)
+        except: # Ignoring errors, we don't want to inform the user wheter he gave us a correct email anyway
+            pass
+        messages.add_message(self.request, messages.SUCCESS, "If you gave us a correct email you'll receive password reset instructions.")
+        return super().form_valid(form)
+
+def portalUserResetPassword(request, uuid_base64, token):
+    try:
+        uuid = force_text(urlsafe_base64_decode(uuid_base64))
+        user = PortalUser.objects.get(uuid=uuid)
+    except:
+        user = None
+    if user is not None and account_token.check_token(user, token):
+        if request.method == 'POST':
+            form = auth.forms.SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                auth.update_session_auth_hash(request, form.user)
+                messages.add_message(request, messages.SUCCESS, "Password changed")
+                # TODO: Redirect to dashboard
+                return redirect(reverse('index'))
+            else:
+                messages.add_message(request, messages.ERROR, 'Something went wrong')
+                return render(request, 'users/password_reset.html', {'form': form})
+        else:
+            form = auth.forms.SetPasswordForm(user)
+            return render(request, 'users/password_reset.html', {'form': form})
+    else:
+        messages.add_message(request, messages.ERROR, "Activation link is invalid")
+        return redirect(reverse('index'))
 
 
 
@@ -108,30 +156,7 @@ def sponsorCreateRequest(request, tournament_id):
     messages.add_message(request, messages.ERROR, 'Something went wrong')
     return redirect('/')
 
-def userLogin(request):
-    if not request.user.is_authenticated:
-        form = PortalUserLoginForm()
-        return render(request, 'users/login.html', {'form': form})
-    messages.add_message(request, messages.INFO, 'You are already signed in')
-    return redirect('/')
 
-def userLoginRequest(request):
-    if request.method == 'POST':
-        form = PortalUserLoginForm(request.POST)
-        if form.is_valid():
-            email = form.data.get('email')
-            password = form.data.get('password')
-            user = auth.authenticate(email=email, password=password)
-            if user:
-                auth.login(request, user)
-                return redirect('/')
-            messages.add_message(request, messages.ERROR, 'Failed to authenticate')
-            return redirect('/users/login')
-        else:
-            formErrorsToMessage(form, request)
-            return redirect('/users/login')
-    messages.add_message(request, messages.ERROR, 'Something went wrong')
-    return redirect('/users/login')
 
 def userLogout(request):
     if request.user.is_authenticated:
