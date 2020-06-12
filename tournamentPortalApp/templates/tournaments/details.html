@@ -1,86 +1,124 @@
-{% extends 'layout.html' %} {% load static %} {% block content %}
+{% extends 'layout.html' %} {% load static %} {% load custom_filters %} {% block content %}
 <div class="container-fluid">
   <h1 class="display-2">{{ object.name }}</h1>
+
+  <div class="card">
+    <div class="card-header">
+      Sponsors {% if is_creator %}<a
+        class="btn btn-primary"
+        href="{% url 'sponsorCreate' object.uuid %}"
+        >Add new</a
+      >{% endif %}
+    </div>
+    <div class="card-body">
+      <div class="card-text">
+        {% for sponsor in sponsors %}
+        <img
+          src="{{ MEDIA_URL }}{{ sponsor.logo }}"
+          alt="{{ sponsor.name }}"
+          title="{{ sponsor.name }}"
+          class="img-thumbnail logo-spons"
+        />
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs" id="tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link active"
+        id="info-tab"
+        data-toggle="tab"
+        href="#info"
+        role="tab"
+        >Info</a
+      >
+    </li>
+    <li clss="nav-item" role="presentation">
+      <a
+        class="nav-link"
+        id="participants-tab"
+        data-toggle="tab"
+        href="#participants"
+        role="tab"
+        >Participants</a
+      >
+    </li>
+  </ul>
+
   <div class="row">
     <div class="col-9">
-      <div class="card">
-        <div class="card-header">Description</div>
-        <div class="card-body">
-          <p>{{ object.description }}</p>
+      <div class="tab-content" id="tab-content">
+        <div class="tab-pane fade show active" id="info" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Description</div>
+            <div class="card-body">
+              <p>{{ object.description }}</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">Prizes</div>
+            <div class="card-body">
+              <p>{{ object.prizes }}</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">Location</div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col">{{ object.location_details }}</div>
+                <div
+                  id="event-map-id"
+                  class="event-map-small col"
+                  data-name="{{ object.name }}"
+                  data-lat="{{ object.location_lat }}"
+                  data-lng="{{ object.location_long }}"
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">Prizes</div>
-        <div class="card-body">
-          <p>{{ object.prizes }}</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">Location</div>
-        <div class="card-body">
-          <div id="event-map-id" data-name="{{ object.name }}"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">Participants</div>
-        <div class="card-body">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-toggle="modal"
-            data-target="#bracketModal"
-            id="bracketShowBtn"
-          >
-            Show bracket
-          </button>
+        <div class="tab-pane fade" id="participants" role="tabpanel">
+          <div class="card">
+            <div class="card-header">Participants</div>
+            <div class="card-body">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#bracketModal"
+                id="bracketShowBtn"
+              >
+                Show bracket
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
     <div class="col">
       <div class="card">
         <div class="card-header">Tournament Details</div>
         <div class="card-body">
           <dl>
-            <dt class="dict-long-head">Start date</dt>
-            <dd>{{ object.event_start_date|date:"F jS Y" }}</dd>
-            <dt class="dict-long-head">Starting time</dt>
-            <dd>{{ object.event_start_date|date:"P" }}</dd>
-            <dt class="dict-long-head">End date</dt>
-            <dd>{{ object.event_end_date|date:"F jS Y" }}</dd>
-            <dt class="dict-long-head">Ending time</dt>
-            <dd>{{ object.event_end_date|date:"P" }}</dd>
-            <dt class="dict-long-head">Entry limit</dt>
-            <dd>{{ object.entry_limit }}</dd>
+            <dt class="dict-long-head">Event starts</dt>
+            <dd>{{ object.event_start_date }}</dd>
+            <dt class="dict-long-head">Event ends</dt>
+            <dd>{{ object.event_end_date }}</dd>
+            <dt>Entry deadline</dt>
+            <dd>{{ object.entry_deadline }}</dd>
+            <dt class="dict-long-head">Participants</dt>
+            <dd>ILE_JEST/{{ object.entry_limit }}</dd>
             <dt class="dict-long-head">Organiser</dt>
             <dd>{{ object.organiser_name }}</dd>
             <dt class="dict-long-head">Game format</dt>
-            <dd>{{ object.game_format }}</dd>
+            <dd>{{ object.game_format|longifyGameFormat }}</dd>
             <dt class="dict-long-head">Deck format</dt>
-            <dd>{{ object.deck_format }}</dd>
+            <dd>{{ object.deck_format|longifyDeckFormat }}</dd>
+            <dt class="dict-long-head">Added by</dt>
+            <dd>{{ object.creator }}</dd>
           </dl>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          Sponsors {% if is_creator %}<a
-            class="btn btn-primary"
-            href="{% url 'sponsorCreate' object.id %}"
-            >Add new</a
-          >{% endif %}
-        </div>
-        <div class="card-body">
-          {% for sponsor in sponsors %}
-          <img
-            src="{{ MEDIA_URL }}/{{ sponsor.logo }}"
-            alt="{{ sponsor.name }}"
-            title="{{ sponsor.name }}"
-            class="sponsor-logo"
-          />
-          {% endfor %}
         </div>
       </div>
     </div>
@@ -110,32 +148,14 @@
   </div>
 </div>
 
-<script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
-<script type="text/javascript">
-  $(document).ready(() => {
-    const mapDiv = document.getElementById("event-map-id");
-    const eventName = mapDiv.dataset.name;
-    var eventLocationMap = L.map("event-map-id").setView([51.505, -0.09], 13);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    }).addTo(eventLocationMap);
-    L.control.scale().addTo(eventLocationMap);
-    L.marker({ lon: 0, lat: 0 }).bindPopup(eventName).addTo(eventLocationMap);
-  })
-
-  const svg = $("#tournament-bracket-id");
-  $(bracketShowBtn).click(() => {
-    var content = $("#bracketContentId");
-    var drawRegionArea = {
-      width: content.width(),
-      height: content.height() - 0.2 * content.height(),
-    };
-    var bracket = new TournamentBracket(null, null, drawRegionArea);
-    svg.html(bracket.svgHtml);
-  });
-</script>
+<script
+  type="text/javascript"
+  src="{% static 'tournaments/tournamentBracket.js' %}"
+></script>
+<script
+  type="text/javascript"
+  src="{% static 'tournaments/tournamentDetails.js' %}"
+></script>
 {% endblock content %} {% block extra_libraries %}
 <link
   rel="stylesheet"

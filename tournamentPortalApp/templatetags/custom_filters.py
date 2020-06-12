@@ -1,19 +1,17 @@
 from django import template
 from libgravatar import Gravatar
 
+from tournamentPortalApp.models import Tournament
+
 register = template.Library()
 
-# @register.filter(name='longifyDeckFormat')
-# def longifyDeckFormat(value):
-#     return TournamentDeckFormatChoice[value].value
+@register.filter(name='longifyDeckFormat')
+def longifyDeckFormat(value):
+    return Tournament.TournamentDeckFormatChoice(value).label
 
-# @register.filter(name="longifyGameFormat")
-# def longifyGameFormat(value):
-#     return TournamentGameFormatChoice[value].value
-
-# @register.filter(name="longifyLocationType")
-# def longifyLocationType(value):
-#     return TournamentLocationChoice[value].value
+@register.filter(name="longifyGameFormat")
+def longifyGameFormat(value):
+    return Tournament.TournamentGameFormatChoice(value).label
 
 @register.filter(name='bootstrapAlertType')
 def bootstrapAlertType(value):

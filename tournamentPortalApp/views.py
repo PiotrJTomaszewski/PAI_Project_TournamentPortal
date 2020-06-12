@@ -3,7 +3,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, CreateView, FormView, UpdateView, TemplateView
 from django.contrib import messages
 import django.contrib.auth as auth
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.utils.http import urlsafe_base64_decode
@@ -35,7 +35,7 @@ class portalUserRegister(FormView):
         user.is_dummy = False
         user.save()
         sendRegisterConfirmationMail(self.request, user)
-        messages.add_message(self.request, messages.SUCCESS, "Successfully registered. We've sent an activation link to your email")
+        messages.add_message(self.request, messages.SUCCESS, "We've sent an activation link to your email.")
         return super().form_valid(form)
 
 def PortalUserActivate(request, uuid_base64, token):
@@ -106,7 +106,7 @@ def portalUserResetPassword(request, uuid_base64, token):
 def portalUserLogout(request):
     if request.user.is_authenticated:
         auth.logout(request)
-        messages.add_message(request, messages.SUCCESS, "Successfully logged out")
+        messages.add_message(request, messages.SUCCESS, "Logged out")
     return redirect('/')
 
 class portalUserDashboard(DetailView):
@@ -130,42 +130,38 @@ class TournamentDetail(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tournament = self.object
-        context['sponsors'] = Sponsor.objects.filter(tournament=tournament.id)
+        context['sponsors'] = Sponsor.objects.filter(tournament=tournament.uuid)
         context['is_creator'] = self.request.user.is_authenticated and tournament.creator.uuid == self.request.user.uuid
         return context
 
+class TournamentCreate(LoginRequiredMixin, FormView):
+    template_name = 'tournaments/create.html'
+    form_class = TournamentCreateForm
+    def form_valid(self, form):
+        tournament = form.save(commit=False)
+        tournament.creator = self.request.user
+        tournament.save()
+        self.success_url = reverse_lazy('tournamentDetail', kwargs={'pk': tournament.uuid})
+        return super().form_valid(form)
 
-
-@login_required
-def tournamentCreate(request):
-    form = TournamentCreateForm()
-    return render(request, 'tournaments/create.html', {'form': form})
-
-@login_required
-def tournamentCreateRequest(request):
-    if request.method == 'POST':
-        form = TournamentCreateForm(request.POST)
-        if form.is_valid():
-            form.save()
-        else:
-            formErrorsToMessage(form, request)
-    return redirect('/tournaments')
-
-def sponsorCreate(request, tournament_id):
-    form = SponsorCreateForm
-    return render(request, 'tournaments/sponsors/create.html', {'form': form, 'tournament_id': tournament_id})
-
-def sponsorCreateRequest(request, tournament_id):
-    form = SponsorCreateForm(request.POST, request.FILES)
-    print(request.FILES['logo'])
-    if form.is_valid():
-        instance = form.save()
-        messages.add_message(request, messages.SUCCESS, 'Sponsor sucessfully added')
-        return redirect('/tournaments/{}'.format(tournament_id))
-    messages.add_message(request, messages.ERROR, 'Something went wrong')
-    return redirect('/')
-
-
-
-
-
+class SponsorCreate(UserPassesTestMixin, FormView):
+    template_name = 'tournaments/sponsors/create.html'
+    form_class = SponsorCreateForm
+    def test_func(self):
+        try:
+            tournament = Tournament.objects.get(uuid=self.kwargs['pk'])
+            user = self.request.user
+            test_result = (user is not None and tournament.creator == user)
+        except:
+            test_result = False
+        return test_result
+    def handle_no_permission(self):
+        messages.add_message(self.request, messages.ERROR, 'Permission denied!')
+        return redirect(reverse('tournamentDetail', kwargs={'pk': self.kwargs['pk']}))
+    def form_valid(self, form):
+        sponsor = form.save(commit=False)
+        sponsor.tournament = get_object_or_404(Tournament, pk=self.kwargs['pk'])
+        sponsor.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Sponsor added')
+        self.success_url = reverse('tournamentDetail', kwargs={'pk': self.kwargs['pk']})
+        return super().form_valid(form)

@@ -5,9 +5,10 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-10">
-      <div class="d-flex flex-wrap">
+      <div class="row row-cols-1 row-cols-md-2">
         {% for tournament in tournaments %}
-          <div class="card tournament-list-element">
+        <div class="col mb-4">
+          <div class="card">
             <div class="card-header">{{ tournament.name }}</div>
             <div class="card-body">
               <div title="Event date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_date|date:"F jS Y" }}</div>
@@ -15,9 +16,10 @@
               <div title="Entry deadline"><i class="far fa-calendar-times padded-icon"></i>{{ tournament.entry_deadline|naturaltime }}</div>
               <div title="Participants"><i class="fas fa-users padded-icon"></i>Ileś / {{ tournament.entry_limit }}</div>
               <div title="Format">{{ tournament.game_format }}, {{ tournament.deck_format }}</div>
-              <a href="{% url 'tournamentDetail' tournament.id %}"><button type="button" class="btn btn-primary m-1">Show info</button></a>
+              <a href="{% url 'tournamentDetail' tournament.uuid %}"><button type="button" class="btn btn-primary m-1">Show info</button></a>
             </div>
           </div>
+        </div>
         {% empty %}
         <div class="display-1 jumbotron mx-auto">
           There are no tournaments
@@ -49,8 +51,8 @@
     <div class="col">
       <div class="card infobox">
         <div class="card-body">
-          <h5 class="card-title">Become an organizer</h5>
-          <p class="card-text">If you are organizing a tournament and want to announce it on our Portal, 
+          <h5 class="card-title">Become an organiser</h5>
+          <p class="card-text">If you are organising a tournament and want to announce it on our Portal, 
             {% if user.is_authenticated %}
             click below.</p><a href="{% url 'tournamentCreate' %}" class="card-link">Announce a tournament</a>
             {% else %}

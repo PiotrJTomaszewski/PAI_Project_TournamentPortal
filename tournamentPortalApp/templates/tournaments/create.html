@@ -2,30 +2,57 @@
 {% load static %}
 
 {% block content %}
+<div class="container">
+  {% for field in form %}
+    {% if field.errors %}
+      <div class="alert alert-danger">{{ field.errors }}</div>
+      {% endif %}
+    {% endfor %}
+  <h1 class="display-2">Announce a tournament</h1>
+  <form action="" method="POST">
+    <fieldset class="form-group">
+      {% csrf_token %}
+      {% for field in form %}
+        <div>
+          {{ field.label_tag }} {{ field }}
+          {% if field.help_text %}
+          <p class="help">{{ field.help_text|safe }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+    </fieldset>
+  </form>
+</div>
 
-<form action={% url 'tournamentCreateRequest' %} method="POST" class="normal-form">
-  <fieldset class="normal-fieldset">
-    <legend class="normal-form-legend">Announce new tournament</legend>
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit" class="normal-form-submit"/>
-  </fieldset>
-</form>
-
-<script type="text/javascript">
-$(document).ready(() => {
-  $("#id_entry_deadline").datetimepicker({
-    format: 'Y-m-d H:i'
-  });
-  $("#id_event_date").datetimepicker({
-    format: 'Y-m-d H:i'
-  });
-})
-</script>
-
+<div class="modal fade" id="id-map-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="id-map-modal-label">Select location on a map</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="event-map-id" class="m-auto event-map-big"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="event-map-confirm-btn-id">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="{% static 'tournaments/tournamentCreate.js' %}"></script>
 {% endblock content %}
 
 {% block extra_libraries %}
 <link rel="stylesheet" type="text/css" href="{% static 'libs/jquery.datetimepicker.min.css' %}" />
 <script src="{% static 'libs/jquery.datetimepicker.full.min.js' %}"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 {% endblock extra_libraries %}

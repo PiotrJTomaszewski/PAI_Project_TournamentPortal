@@ -1,11 +1,21 @@
-{% extends "layout.html" %}
-{% block content %}
-<form action={% url 'sponsorCreateRequest' tournament_id %} method="POST" class="normal-form" enctype="multipart/form-data">
-    <fieldset class="normal-fieldset">
-      <legend class="normal-form-legend">Add tournament sponsors</legend>
-      {% csrf_token %}
-      {{ form }}
-      <input type="submit" value="Submit" class="normal-form-submit"/>
+{% extends "layout.html" %} {% block content %}
+<div class="container">
+  {% for field in form %} {% if field.errors %}
+  <div class="alert alert-danger">{{ field.errors }}</div>
+  {% endif %} {% endfor %}
+  <h1 class="display-2">Add tournament sponsor</h1>
+  <form action="" method="POST" enctype="multipart/form-data">
+    <fieldset class="form-group">
+      {% csrf_token %} {% for field in form %}
+      <div>
+        {{ field.label_tag }} {{ field }} {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <input type="submit" value="Submit" class="btn btn-primary mt-2" />
     </fieldset>
   </form>
+</div>
+
 {% endblock %}

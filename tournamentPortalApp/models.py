@@ -4,6 +4,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.files.storage import FileSystemStorage
+from django.core.validators import MaxLengthValidator
 
 from enum import Enum
 import uuid
@@ -18,7 +19,6 @@ fs = FileSystemStorage()
 
 def getUserDeleted():
     return get_user_model().objects.get(id=2)
-
 
 class PortalUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password, is_active=False, is_admin=False, is_dummy=False):
@@ -66,7 +66,7 @@ class PortalUser(AbstractBaseUser):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'is_active', 'is_admin', 'is_dummy']
 
     def __str__(self):
-        return self.email
+        return "{} {} ({})".format(self.first_name, self.last_name, self.email)
 
     def has_perm(self, perm, obj=None):
         return True
@@ -78,11 +78,10 @@ class PortalUser(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
-
 class Tournament(models.Model):
-    class TournamentLocationChoice(models.TextChoices):
-        NETWORK = 'net', _("Network")
-        PHYS_LOC = 'loc', _("Physical location")
+    # class TournamentLocationChoice(models.TextChoices):
+    #     NETWORK = 'net', _("Network")
+    #     PHYS_LOC = 'loc', _("Physical location")
 
     class TournamentGameFormatChoice(models.TextChoices):
         STANDARD = 'std', _("Standard")
@@ -92,7 +91,9 @@ class Tournament(models.Model):
         SINGLE_DECK = 'sin', _("Single-deck")
         MULTIPLE_DECK = 'mul', _("Multiple-deck")
 
-    name = models.CharField(max_length=100)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField("Event name", max_length=100)
     entry_deadline = models.DateTimeField()
     entry_limit = models.PositiveSmallIntegerField()
     event_start_date = models.DateTimeField()
@@ -100,26 +101,23 @@ class Tournament(models.Model):
     creator = models.ForeignKey(
         get_user_model(), on_delete=models.SET(getUserDeleted))
     organiser_name = models.CharField(max_length=50)
-    location_type = models.CharField(
-        max_length=3, choices=TournamentLocationChoice.choices)
-    location = models.CharField(max_length=50)
+    # location_type = models.CharField(
+    #     max_length=3, choices=TournamentLocationChoice.choices)
+    location_lat = models.DecimalField('Location Latitude', max_digits=9, decimal_places=5)
+    location_long = models.DecimalField('Location Longitude', max_digits=9, decimal_places=5)
+    location_details = models.CharField(max_length=100)
     game_format = models.CharField(
         max_length=3, choices=TournamentGameFormatChoice.choices)
     deck_format = models.CharField(
         max_length=3, choices=TournamentDeckFormatChoice.choices)
-    description = models.TextField()
-    prizes = models.TextField()
+    description = models.TextField(validators=[MaxLengthValidator(512)])
+    prizes = models.TextField(validators=[MaxLengthValidator(512)])
 
     def __str__(self):
         return self.name
 
-    def slug(self):
-        return slugify(self.name)
-
-
 def get_sponsor_file_path(instance, filename):
-    return 'tournaments/{}/sponsors/{}.webp'.format(instance.tournament.id, instance.uuid)
-
+    return 'tournaments/{}/sponsors/{}.webp'.format(instance.tournament.uuid, instance.uuid)
 
 class Sponsor(models.Model):
     uuid = models.UUIDField(
@@ -129,7 +127,7 @@ class Sponsor(models.Model):
     logo = models.ImageField(upload_to=get_sponsor_file_path, storage=fs)
 
     def save(self, *args, **kwargs):
-        self.logo = makeThumbnail(self.logo, size=(150, 150))
+        self.logo = makeThumbnail(self.logo, size=(100, 100))
         super().save(*args, **kwargs)
 
 
