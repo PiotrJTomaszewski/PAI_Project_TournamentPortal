@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% load humanize %}
-
+{% load custom_filters %}
 {% block content %}
 <div class="container-fluid">
   <div class="row">
@@ -9,13 +9,13 @@
         {% for tournament in tournaments %}
         <div class="col mb-4">
           <div class="card">
-            <div class="card-header">{{ tournament.name }}</div>
+            <div class="card-header h4">{{ tournament.name }}</div>
             <div class="card-body">
-              <div title="Event date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_date|date:"F jS Y" }}</div>
-              <div title="Event time"><i class="far fa-clock padded-icon"></i>{{ tournament.event_date|date:"P" }}</div>
+              <div title="Event start date"><i class="far fa-calendar padded-icon"></i>{{ tournament.event_start_date|date:"F jS Y" }}</div>
+              <div title="Event start time"><i class="far fa-clock padded-icon"></i>{{ tournament.event_start_date|date:"P" }}</div>
               <div title="Entry deadline"><i class="far fa-calendar-times padded-icon"></i>{{ tournament.entry_deadline|naturaltime }}</div>
-              <div title="Participants"><i class="fas fa-users padded-icon"></i>Ileś / {{ tournament.entry_limit }}</div>
-              <div title="Format">{{ tournament.game_format }}, {{ tournament.deck_format }}</div>
+              <div title="Participants"><i class="fas fa-users padded-icon"></i>{{ tournament.current_participant_no }} / {{ tournament.entry_limit }}</div>
+              <div title="Format">{{ tournament.game_format|longifyGameFormat }}, {{ tournament.deck_format|longifyDeckFormat }}</div>
               <a href="{% url 'tournamentDetail' tournament.uuid %}"><button type="button" class="btn btn-primary m-1">Show info</button></a>
             </div>
           </div>

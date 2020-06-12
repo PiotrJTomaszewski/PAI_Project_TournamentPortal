@@ -3,7 +3,7 @@
   {% for field in form %} {% if field.errors %}
   <div class="alert alert-danger">{{ field.errors }}</div>
   {% endif %} {% endfor %}
-  <h1 class="display-2">Add tournament sponsor</h1>
+  <h1 class="display-2">Participate in {{ tournament.name }}</h1>
   <form action="" method="POST" enctype="multipart/form-data">
     <fieldset class="form-group">
       {% csrf_token %} {% for field in form %}
@@ -13,7 +13,7 @@
         {% endif %}
       </div>
       {% endfor %}
-      <input type="submit" value="Add sponsor" class="btn btn-primary mt-2" />
+      <input type="submit" value="Participate" class="btn btn-primary mt-2" />
     </fieldset>
   </form>
 </div>

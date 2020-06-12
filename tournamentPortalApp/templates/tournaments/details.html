@@ -1,4 +1,5 @@
-{% extends 'layout.html' %} {% load static %} {% load custom_filters %} {% block content %}
+{% extends 'layout.html' %} {% load static %} {% load custom_filters %}
+{% block content %}
 <div class="container-fluid">
   <h1 class="display-2">{{ object.name }}</h1>
 
@@ -92,6 +93,9 @@
               >
                 Show bracket
               </button>
+              <div>
+                {% for participant in participants %} {{ participant.user }} {% endfor %}
+              </div>
             </div>
           </div>
         </div>
@@ -104,12 +108,14 @@
           <dl>
             <dt class="dict-long-head">Event starts</dt>
             <dd>{{ object.event_start_date }}</dd>
-            <dt class="dict-long-head">Event ends</dt>
-            <dd>{{ object.event_end_date }}</dd>
             <dt>Entry deadline</dt>
             <dd>{{ object.entry_deadline }}</dd>
             <dt class="dict-long-head">Participants</dt>
-            <dd>ILE_JEST/{{ object.entry_limit }}</dd>
+            <dd>{{ object.current_participant_no }} / {{ object.entry_limit }}
+              {% if can_participate %}
+              <a href="{% url 'participantCreate' object.uuid %}" class="btn btn-primary" >Participate</a>
+              {% endif %}
+            </dd>
             <dt class="dict-long-head">Organiser</dt>
             <dd>{{ object.organiser_name }}</dd>
             <dt class="dict-long-head">Game format</dt>

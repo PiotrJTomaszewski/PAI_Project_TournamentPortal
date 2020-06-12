@@ -20,6 +20,7 @@ fs = FileSystemStorage()
 def getUserDeleted():
     return get_user_model().objects.get(id=2)
 
+
 class PortalUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password, is_active=False, is_admin=False, is_dummy=False):
         if not email or not first_name or not last_name or not password:
@@ -52,7 +53,8 @@ class PortalUserManager(BaseUserManager):
 
 
 class PortalUser(AbstractBaseUser):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=100, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -63,20 +65,22 @@ class PortalUser(AbstractBaseUser):
     objects = PortalUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'is_active', 'is_admin', 'is_dummy']
+    REQUIRED_FIELDS = ['first_name', 'last_name',
+                       'is_active', 'is_admin', 'is_dummy']
 
     def __str__(self):
         return "{} {} ({})".format(self.first_name, self.last_name, self.email)
 
     def has_perm(self, perm, obj=None):
         return True
-    
+
     def has_module_perms(self, app_label):
         return True
 
     @property
     def is_staff(self):
         return self.is_admin
+
 
 class Tournament(models.Model):
     # class TournamentLocationChoice(models.TextChoices):
@@ -96,15 +100,17 @@ class Tournament(models.Model):
     name = models.CharField("Event name", max_length=100)
     entry_deadline = models.DateTimeField()
     entry_limit = models.PositiveSmallIntegerField()
+    current_participant_no = models.PositiveSmallIntegerField()
     event_start_date = models.DateTimeField()
-    event_end_date = models.DateTimeField()
     creator = models.ForeignKey(
         get_user_model(), on_delete=models.SET(getUserDeleted))
     organiser_name = models.CharField(max_length=50)
     # location_type = models.CharField(
     #     max_length=3, choices=TournamentLocationChoice.choices)
-    location_lat = models.DecimalField('Location Latitude', max_digits=9, decimal_places=5)
-    location_long = models.DecimalField('Location Longitude', max_digits=9, decimal_places=5)
+    location_lat = models.DecimalField(
+        'Location Latitude', max_digits=9, decimal_places=5)
+    location_long = models.DecimalField(
+        'Location Longitude', max_digits=9, decimal_places=5)
     location_details = models.CharField(max_length=100)
     game_format = models.CharField(
         max_length=3, choices=TournamentGameFormatChoice.choices)
@@ -116,8 +122,10 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name
 
+
 def get_sponsor_file_path(instance, filename):
     return 'tournaments/{}/sponsors/{}.webp'.format(instance.tournament.uuid, instance.uuid)
+
 
 class Sponsor(models.Model):
     uuid = models.UUIDField(
@@ -132,6 +140,11 @@ class Sponsor(models.Model):
 
 
 class Participant(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         get_user_model(), on_delete=models.SET(getUserDeleted))
-    tournament = models.OneToOneField(Tournament, on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    license_number = models.CharField("License number", max_length=100)
+    current_ranking = models.CharField("Current ranking", max_length=100)
+
+    class Meta:
+        unique_together = (('user', 'tournament'), ('tournament', 'license_number'), ('tournament', 'current_ranking'))
