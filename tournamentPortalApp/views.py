@@ -3,6 +3,7 @@ from django.views.generic.list import ListView
 from django.views.generic import DetailView, CreateView, FormView, UpdateView, TemplateView
 from django.contrib import messages
 import django.contrib.auth as auth
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
 from django.utils.http import urlsafe_base64_decode
@@ -102,30 +103,38 @@ def portalUserResetPassword(request, uuid_base64, token):
         messages.add_message(request, messages.ERROR, "Activation link is invalid")
         return redirect(reverse('index'))
 
+def portalUserLogout(request):
+    if request.user.is_authenticated:
+        auth.logout(request)
+        messages.add_message(request, messages.SUCCESS, "Successfully logged out")
+    return redirect('/')
+
+class portalUserDashboard(DetailView):
+    template_name = 'users/dashboard.html'
+    model = PortalUser
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     return context
+
 class TournamentList(ListView):
     template_name = 'tournaments/list.html'
     model = Tournament
-    paginate_by = 9
+    paginate_by = 10
     context_object_name = 'tournaments'
     queryset = Tournament.objects.order_by('entry_deadline') # TODO: Filter
     # TODO: Implement search box
 
-
-
-
-class TournamentDetail(DetailView):
+class TournamentDetail(LoginRequiredMixin, DetailView):
     template_name = 'tournaments/details.html'
     model = Tournament
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tournament = self.object
         context['sponsors'] = Sponsor.objects.filter(tournament=tournament.id)
-        if self.request.user.is_authenticated and tournament.creator.id == self.request.user.id:
-            context['is_creator'] = True
-        else:
-            context['is_creator'] = False
+        context['is_creator'] = self.request.user.is_authenticated and tournament.creator.uuid == self.request.user.uuid
         return context
+
+
 
 @login_required
 def tournamentCreate(request):
@@ -158,9 +167,5 @@ def sponsorCreateRequest(request, tournament_id):
 
 
 
-def userLogout(request):
-    if request.user.is_authenticated:
-        auth.logout(request)
-        messages.add_message(request, messages.SUCCESS, "Successfully logged out")
-    return redirect('/')
+
 

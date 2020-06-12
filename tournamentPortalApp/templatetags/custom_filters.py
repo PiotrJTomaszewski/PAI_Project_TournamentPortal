@@ -1,4 +1,5 @@
 from django import template
+from libgravatar import Gravatar
 
 register = template.Library()
 
@@ -23,3 +24,7 @@ def bootstrapAlertType(value):
     if value == 'info':
         return 'alert-primary'
     return 'NOTFOUND'+value
+
+@register.filter(name='gravatar')
+def gravatar_url(email, size=40):
+    return Gravatar(email).get_image(size=size, default='retro')

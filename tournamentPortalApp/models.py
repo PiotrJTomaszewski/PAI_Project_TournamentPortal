@@ -95,7 +95,8 @@ class Tournament(models.Model):
     name = models.CharField(max_length=100)
     entry_deadline = models.DateTimeField()
     entry_limit = models.PositiveSmallIntegerField()
-    event_date = models.DateTimeField()
+    event_start_date = models.DateTimeField()
+    event_end_date = models.DateTimeField()
     creator = models.ForeignKey(
         get_user_model(), on_delete=models.SET(getUserDeleted))
     organiser_name = models.CharField(max_length=50)

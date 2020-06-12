@@ -30,10 +30,10 @@
             <li class="nav-item dropdown justify-content-end">
               <div class="btn-group dropleft" role="group">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
-                  {{ user.get_username }}
+                  {{ user.get_username }} <img src="{{ user.email|gravatar }}" class="rounded"/>
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#"><i class="fas fa-tachometer-alt padded-icon"></i>Dashboard</a>
+                  <a class="dropdown-item" href="{% url 'userDashboard' pk=user.uuid %}"><i class="fas fa-tachometer-alt padded-icon"></i>Dashboard</a>
                   <a class="dropdown-item" href="{% url 'userLogout' %}" ><i class="fas fa-sign-out-alt padded-icon"></i>Logout</a>
                 </div>
               </div>

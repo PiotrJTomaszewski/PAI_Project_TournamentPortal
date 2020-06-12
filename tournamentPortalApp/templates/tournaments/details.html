@@ -1,84 +1,145 @@
-{% extends 'layout.html' %}
-{% load static %}
+{% extends 'layout.html' %} {% load static %} {% block content %}
+<div class="container-fluid">
+  <h1 class="display-2">{{ object.name }}</h1>
+  <div class="row">
+    <div class="col-9">
+      <div class="card">
+        <div class="card-header">Description</div>
+        <div class="card-body">
+          <p>{{ object.description }}</p>
+        </div>
+      </div>
 
-{% block content %}
-  <h1>{{ object.name }}</h1>
+      <div class="card">
+        <div class="card-header">Prizes</div>
+        <div class="card-body">
+          <p>{{ object.prizes }}</p>
+        </div>
+      </div>
 
-  {{ object.entry_limit }} {{ object.event_date|date }} {{ object.creator }} {{
-  object.organiser_name }} {{ object.location_type }} {{ object.location }} {{
-  object.game_format }} {{ object.deck_format }} {{ object.description }} {{
-  object.prizes }}
+      <div class="card">
+        <div class="card-header">Location</div>
+        <div class="card-body">
+          <div id="event-map-id" data-name="{{ object.name }}"></div>
+        </div>
+      </div>
 
-  {{ location_type_text }}
-  {{ game_format_text }}
-  {{ deck_format_text }}
-  <div class="card">
-    <div class="card-header">Information</div>
-    <dl>
-      <dt class="dict-long-head">Event date</dt>
-      <dd>{{ object.event_date|date:"F jS Y" }}</dd>
-      <dt class="dict-long-head">Starting time</dt>
-      <dd>{{ object.event_date|date:"P" }}</dd>
-      <dt class="dict-long-head">Entry limit</dt>
-      <dd>{{ object.entry_limit }}</dd>
-      <dt class="dict-long-head">Organiser</dt>
-      <dd>{{ object.organiser_name }}</dd>
-      <dt class="dict-long-head">Game format</dt>
-      <dd>{{ object.game_format }}</dd>
-      <dt class="dict-long-head">Deck format</dt>
-      <dd>{{ object.deck_format }}</dd>
-    </dl>
-  </div>
-  <div class="card">
-    <div class="card-header">Description</div>
-    <p>{{ object.description }}</p>
-  </div>
-  <div class="card">
-    <div class="card-header">Prizes</div>
-    <p>{{ object.prizes }}</p>
-  </div>
-  <div class="card">
-    <div class="card-header">Participants</div>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      Sponsors {% if is_creator %}<a class="btn btn-primary" href="{% url 'sponsorCreate' object.id %}">Add new</a>{% endif %}
+      <div class="card">
+        <div class="card-header">Participants</div>
+        <div class="card-body">
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-toggle="modal"
+            data-target="#bracketModal"
+            id="bracketShowBtn"
+          >
+            Show bracket
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      {% for sponsor in sponsors %}
-        <img src="{{ MEDIA_URL }}/{{ sponsor.logo }}" alt="{{ sponsor.name }}" title="{{ sponsor.name }}" />
-      {% endfor %}
+
+    <div class="col">
+      <div class="card">
+        <div class="card-header">Tournament Details</div>
+        <div class="card-body">
+          <dl>
+            <dt class="dict-long-head">Start date</dt>
+            <dd>{{ object.event_start_date|date:"F jS Y" }}</dd>
+            <dt class="dict-long-head">Starting time</dt>
+            <dd>{{ object.event_start_date|date:"P" }}</dd>
+            <dt class="dict-long-head">End date</dt>
+            <dd>{{ object.event_end_date|date:"F jS Y" }}</dd>
+            <dt class="dict-long-head">Ending time</dt>
+            <dd>{{ object.event_end_date|date:"P" }}</dd>
+            <dt class="dict-long-head">Entry limit</dt>
+            <dd>{{ object.entry_limit }}</dd>
+            <dt class="dict-long-head">Organiser</dt>
+            <dd>{{ object.organiser_name }}</dd>
+            <dt class="dict-long-head">Game format</dt>
+            <dd>{{ object.game_format }}</dd>
+            <dt class="dict-long-head">Deck format</dt>
+            <dd>{{ object.deck_format }}</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          Sponsors {% if is_creator %}<a
+            class="btn btn-primary"
+            href="{% url 'sponsorCreate' object.id %}"
+            >Add new</a
+          >{% endif %}
+        </div>
+        <div class="card-body">
+          {% for sponsor in sponsors %}
+          <img
+            src="{{ MEDIA_URL }}/{{ sponsor.logo }}"
+            alt="{{ sponsor.name }}"
+            title="{{ sponsor.name }}"
+            class="sponsor-logo"
+          />
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
-  <div id="event-map-id" data-name="{{ object.name }}"></div>
+</div>
 
-  <svg id="tournament-bracket-id"></svg>
+<div
+  class="modal fade bracket-modal"
+  id="bracketModal"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog bracket-modal-dialog">
+    <div class="modal-content bracket-modal-content" id="bracketContentId">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bracketModalLabel">Tournament Bracket</h5>
+      </div>
+      <div class="modal-body">
+        <svg id="tournament-bracket-id" class="bracket"></svg>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
+<script src="{% static 'tournaments/tournamentBracket.js' %}"></script>
 <script type="text/javascript">
   $(document).ready(() => {
-    const mapDiv = document.getElementById('event-map-id');
+    const mapDiv = document.getElementById("event-map-id");
     const eventName = mapDiv.dataset.name;
-    var eventLocationMap = L.map('event-map-id').setView([51.505, -0.09], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var eventLocationMap = L.map("event-map-id").setView([51.505, -0.09], 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+      attribution:
+        '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
     }).addTo(eventLocationMap);
     L.control.scale().addTo(eventLocationMap);
-    L.marker({lon: 0, lat: 0}).bindPopup(eventName).addTo(eventLocationMap);
-
-    const svg = $("#tournament-bracket-id");
-    const drawRegionArea = {
-      width: 1200,
-      height: 600
-    }
-    var bracket = new TournamentBracket(null, null, drawRegionArea);
-    svg.width(drawRegionArea.width).height(drawRegionArea.height).html(bracket.svgHtml);
+    L.marker({ lon: 0, lat: 0 }).bindPopup(eventName).addTo(eventLocationMap);
   })
-</script>
-{% endblock content %}
 
-{% block extra_libraries %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  const svg = $("#tournament-bracket-id");
+  $(bracketShowBtn).click(() => {
+    var content = $("#bracketContentId");
+    var drawRegionArea = {
+      width: content.width(),
+      height: content.height() - 0.2 * content.height(),
+    };
+    var bracket = new TournamentBracket(null, null, drawRegionArea);
+    svg.html(bracket.svgHtml);
+  });
+</script>
+{% endblock content %} {% block extra_libraries %}
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+/>
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
 {% endblock extra_libraries %}

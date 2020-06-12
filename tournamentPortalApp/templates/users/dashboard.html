@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-9">
+            <div>
+                <h2 class="display-2">Comming up</h2>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="{{ user.email|gravatar:50 }}" class="card-img-top big-gravatar" alt="User logo">
+                <div class="card-body">
+                    <h5 class="card-title">{{user.first_name}} {{user.last_name}}</h5>
+                    <p class="card-text">{{user.email}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock content %}
