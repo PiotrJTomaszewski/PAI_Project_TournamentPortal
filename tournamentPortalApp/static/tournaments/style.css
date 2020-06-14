@@ -22,10 +22,6 @@
     height: 100%;
 }
 
-.bracket-modal-dialog {
-    margin-left: 1vw;
-}
-
 .bracket-modal-content {
     width: 95vw;
     height: 90vh;
@@ -44,4 +40,8 @@
 .logo-spons {
     width: 100px;
     height: 100px;
+}
+
+.equal_width {
+    width: 50%;
 }

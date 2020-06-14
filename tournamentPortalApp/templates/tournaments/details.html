@@ -2,6 +2,9 @@
 {% block content %}
 <div class="container-fluid">
   <h1 class="display-2">{{ object.name }}</h1>
+  {% if is_creator %}
+  <a href="{% url 'tournamentEdit' object.uuid %}" class="btn btn-primary">Edit details</a>
+  {% endif %}
 
   <div class="card">
     <div class="card-header">
@@ -82,19 +85,41 @@
         </div>
         <div class="tab-pane fade" id="participants" role="tabpanel">
           <div class="card">
-            <div class="card-header">Participants</div>
-            <div class="card-body">
+            <div class="card-header">Results
               <button
                 type="button"
                 class="btn btn-primary"
                 data-toggle="modal"
                 data-target="#bracketModal"
                 id="bracketShowBtn"
+                style="display:none"
               >
-                Show bracket
-              </button>
+              Show bracket
+            </button></div>
+            <div class="card-body" id="matches-results">
+              <h2 class="display-3">There were no matches played yet</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">Participants</div>
+            <div class="card-body">
               <div>
-                {% for participant in participants %} {{ participant.user }} {% endfor %}
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for participant in participants %}
+                    <tr>
+                      <td>{{ participant.user.first_name }} {{ participant.user.last_name }}</td>
+                      <td>{{ participant.current_ranking }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -132,18 +157,18 @@
 </div>
 
 <div
-  class="modal fade bracket-modal"
+  class="modal bracket-modal"
   id="bracketModal"
   tabindex="-1"
   role="dialog"
 >
-  <div class="modal-dialog bracket-modal-dialog">
+  <div class="modal-dialog-xl modal-dialog-scrollable">
     <div class="modal-content bracket-modal-content" id="bracketContentId">
       <div class="modal-header">
         <h5 class="modal-title" id="bracketModalLabel">Tournament Bracket</h5>
       </div>
-      <div class="modal-body">
-        <svg id="tournament-bracket-id" class="bracket"></svg>
+      <div class="modal-body bracket-modal-body">
+        <svg id="tournament-bracket-id" class="bracket" overflow="scroll"></svg>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
@@ -153,6 +178,7 @@
     </div>
   </div>
 </div>
+<div id="participants-js-data" data-tournament-uuid="{{ object.uuid }}"></div>
 
 <script
   type="text/javascript"

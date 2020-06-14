@@ -4,16 +4,34 @@
     <div class="col-9">
       <div>
         <h3 class="display-3">Comming up</h3>
+        <table class="table">
+            {% for participant in tournaments_comming_up %}
+            <tr><td class="equal_width"><i class="far fa-calendar padded-icon" title="Event start date"></i> {{ participant.tournament.event_start_date }}</td><td class="equal_width"><a href="{% url 'tournamentDetail' participant.tournament.uuid %}">{{ participant.tournament.name }}</a></td></tr>
+            {% endfor %}
+        </table>
       </div>
       <div>
+        {% if tournaments_organised_by_me %}
         <h3 class="display-3">Organised by me</h3>
-        <ul>
-          {% for tournament in tournaments_organised_by_me %}
-          <li>{{ tournament }}</li>
-          {% endfor %}
-        </ul>
+        <table class="table">
+            {% for tournament in tournaments_organised_by_me %}
+            <tr><td class="equal_width"><i class="far fa-calendar padded-icon" title="Event start date"></i> {{ tournament.event_start_date }}</td><td class="equal_width"><a href="{% url 'tournamentDetail' tournament.uuid %}">{{ tournament.name }}</a></td></tr>
+            {% endfor %}
+        </table>
+        {% endif %}
       </div>
+    <div>
+      {% if tournaments_past %}
+      <h3 class="display-3">Past tournaments</h3>
+      <table class="table">
+          {% for participant in tournaments_past %}
+          <tr><td class="equal_width"><i class="far fa-calendar padded-icon" title="Event start date"></i> {{ participant.tournament.event_start_date }}</td><td class="equal_width"><a href="{% url 'tournamentDetail' participant.tournament.uuid %}">{{ participant.tournament.name }}</a></td> </tr>
+          {% endfor %}
+      </table>
+      {% endif %}
     </div>
+  </div>
+
     <div class="col">
       <div class="card" style="width: 18rem;">
         <img

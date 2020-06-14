@@ -5,11 +5,11 @@
 <div class="container">
   {% for field in form %}
     {% if field.errors %}
-      <div class="alert alert-danger">{{ field.errors }}</div>
+      <div class="alert alert-danger">{{field.label}}{{ field.errors }}</div>
       {% endif %}
     {% endfor %}
   <h1 class="display-2">Announce a tournament</h1>
-  <form action="" method="POST">
+  <form action="" method="POST" id="form">
     <fieldset class="form-group">
       {% csrf_token %}
       {% for field in form %}
@@ -20,7 +20,7 @@
           {% endif %}
         </div>
       {% endfor %}
-      <input type="submit" value="Submit" class="btn btn-primary"/>
+      <input type="button" value="Submit" id="submitBtn" data-toggle="modal" data-target="#confirm-submit" class="btn btn-primary mt-" />
     </fieldset>
   </form>
 </div>
@@ -44,6 +44,33 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              Confirm Submit
+          </div>
+          <div class="modal-body">
+              Are you sure?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <a href="#" id="modalSubmit" class="btn btn-primary success">Submit</a>
+          </div>
+      </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $("#modalSubmit").click(()=>{
+      $("#form").submit();
+  })
+  $(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        $("#confirm-submit").modal("show");
+        event.preventDefault();
+    }})
+</script>
 <script type="text/javascript" src="{% static 'tournaments/tournamentCreate.js' %}"></script>
 {% endblock content %}
 

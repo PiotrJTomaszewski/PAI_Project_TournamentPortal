@@ -37,6 +37,11 @@ $(document).ready(() => {
     L.popup().setLatLng(event.latlng).setContent('Event location').openOn(eventLocationMap);
     selectedLocation = event.latlng;
   })
+  const lat = $("#id_location_lat").val();
+  const lng = $("#id_location_long").val();
+  if (!isNaN(lat) && !isNaN(lng) && lat !== '' && lng !== '') {
+    L.popup().setLatLng(L.latLng(lat, lng)).setContent('Event location').openOn(eventLocationMap);
+  }
 });
 
 $("#id_description").on('input', () => {

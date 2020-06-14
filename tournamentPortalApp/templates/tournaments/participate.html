@@ -1,10 +1,10 @@
 {% extends "layout.html" %} {% block content %}
 <div class="container">
   {% for field in form %} {% if field.errors %}
-  <div class="alert alert-danger">{{ field.errors }}</div>
+  <div class="alert alert-danger">{{field.label}}{{ field.errors }}</div>
   {% endif %} {% endfor %}
   <h1 class="display-2">Participate in {{ tournament.name }}</h1>
-  <form action="" method="POST" enctype="multipart/form-data">
+  <form action="" method="POST" enctype="multipart/form-data" id="form">
     <fieldset class="form-group">
       {% csrf_token %} {% for field in form %}
       <div>
@@ -13,8 +13,36 @@
         {% endif %}
       </div>
       {% endfor %}
-      <input type="submit" value="Participate" class="btn btn-primary mt-2" />
+      <input type="button" value="Participate" id="submitBtn" data-toggle="modal" data-target="#confirm-submit" class="btn btn-primary mt-2" />
     </fieldset>
   </form>
 </div>
+<div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              Confirm Submit
+          </div>
+          <div class="modal-body">
+              Are you sure you want to participate in {{ tournament.name }}?
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <a href="#" id="modalSubmit" class="btn btn-primary success">Participate</a>
+          </div>
+      </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $("#modalSubmit").click(()=>{
+      $("#form").submit();
+  });
+  $(document).keypress(
+      function(event){
+        if (event.which == '13') {
+          $("#confirm-submit").modal("show");
+          event.preventDefault();
+        }
+      });
+</script>
 {% endblock %}

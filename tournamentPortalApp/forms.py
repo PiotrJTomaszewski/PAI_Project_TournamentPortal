@@ -115,6 +115,10 @@ class SponsorCreateForm(forms.ModelForm):
 
 
 class ParticipantCreateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.base_fields['license_number'].widget.attrs.update({'class': 'form-control'})
+        self.base_fields['current_ranking'].widget.attrs.update({'class': 'form-control'})
+        super(ParticipantCreateForm, self).__init__(*args, **kwargs)
     class Meta:
         model = Participant
         fields = ('license_number', 'current_ranking')
