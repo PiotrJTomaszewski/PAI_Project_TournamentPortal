@@ -81,6 +81,8 @@ class TournamentCreateForm(forms.ModelForm):
 
     def clean_entry_deadline(self):
         entry_deadline = self.cleaned_data['entry_deadline']
+        if self.initial.entry_deadline is not None and self.initial.entry_deadline != entry_deadline:
+            raise ValidationError(_("Entry deadline cannot be changed"))
         if entry_deadline < datetime.now(tz=entry_deadline.tzinfo):
             raise ValidationError(_("Entry deadline cannot be in the past"))
         return entry_deadline
